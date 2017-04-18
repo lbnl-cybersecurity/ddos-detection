@@ -6,4 +6,4 @@ Still not finding a clue about which netflow version these files are using altho
 
 nfTocsv.py converts nfcapd dump files to csv files.
 
-
+Next step: import these csv files into a database
