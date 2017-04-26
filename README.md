@@ -23,11 +23,13 @@ Initial findings about this data:
 - The nfcapd dump files are divided into 5min bins, based on the 'tr time': time the flow was received by the controller
    - Ex. dump file with timestamp 2016/01/31 19:15, includes netflow records received between 19:15 and 19:20
    - We could calculate the deviation of the exact time the flow occurs and the observed time window.
-- cl/sl/al: client/server/application latency; The value under 'cl/sl/al' are ALL 0.
+- cl/sl/al: client/server/application latency; The values under 'cl/sl/al' are ALL 0.
 
 [(1)]:http://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html
 
 Next step: plot entropy timeseries values as shown in this [paper](https://users.ece.cmu.edu/~vsekar/papers/imcfp04-nychis.pdf).
-- based on sa(source address), da(destination address), sp(source port), dp(destination port), and ipkt/ibyt
-- connect to the database
+- based on sa(source address), da(destination address), sp(source port), dp(destination port), and ipkt/ibyt, and tr
+- crosscheck number:
+   - database
+   - direct using csv files
 
