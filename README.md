@@ -15,6 +15,27 @@ Next step: import these csv files into a database.
 
 csv2sqlite.py imports csv files into a database.
 
+General findings about nfdumped csv files:
+- 48 fields
+- ts, te, td: time start (first packet seen of this flow), time end(last packet seen of this flow), time duration
+- sa, da, sp, dp, pr: source/destination address, source/destination port, protocol
+- flg: ------, 6 bits, TCP flags
+- fwd: forwarding status
+- stos, dtos: src/des TOS
+- ipkt, ibyt, opkt, obyt: incoming packets/bytes, outgoing packets/bytes
+- in, out: input/output interface SNMP number
+- sas, das: source/destination BGP AS
+- smk, dmk: source/destination mask
+- dir: direction, 0: ingress flow, 1: egress flow
+- nh, nhb: nexthop IP address, bgp next hop IP
+- svlan, dvlan: src/dst vlan label
+- ismc, odmc, idmc, osmc: input src, output dst, input dst, output src MAC
+- mpls1-10: MPLS label 1-10
+- cl, sl, al: client/server/application latency
+- ra, eng, exid: router IP, router engine type/id, exporter sysid
+- tr: time the flow was received by the controller
+
+
 Starting with netflow traces collected from router lbl-mr2. This dataset contains sampled flows from 01/31/2016 - 02/13/2016.
 - other than day 02/11, which has 278 dump files, each day has 288 files; 288 = 24*60/5
 - on day 02/11, files are missing between 10:15 and 11:10 (nfcapd.201602111110.csv is next to nfcapd.201602111015.csv)
