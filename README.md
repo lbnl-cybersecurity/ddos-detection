@@ -16,6 +16,9 @@ Next step: import these csv files into a database.
 csv2sqlite.py imports csv files into a database.
 
 Starting with netflow traces collected from router lbl-mr2. This dataset contains sampled flows from 01/31/2016 - 02/13/2016.
+- other than day 02/11, which has 278 dump files, each day has 288 files; 288 = 24*60/5
+- on day 02/11, files are missing between 10:15 and 11:10 (nfcapd.201602111110.csv is next to nfcapd.201602111015.csv)
+
 Initial findings about this data:
 - dir: flow direction: 0 - ingress flow, 1 - egress flow [(1)]; The values under 'dir' are ALL 0. 
 - opkt/obyt: output packets, bytes; The values under 'opkt/obyt' are ALL 0.
