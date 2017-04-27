@@ -28,7 +28,7 @@ General findings about nfdumped csv files:
   - smk, dmk: source/destination mask
   - dir: direction, 0: ingress flow, 1: egress flow
   - nh, nhb: nexthop IP address, bgp next hop IP
-  - svlan, dvlan: src/dst vlan label
+  - svln, dvln: src/dst vlan label
   - ismc, odmc, idmc, osmc: input src, output dst, input dst, output src MAC
   - mpls1-10: MPLS label 1-10
   - cl, sl, al: client/server/application latency
@@ -41,13 +41,20 @@ Starting with netflow traces collected from router lbl-mr2. This dataset contain
 - on day 02/11, files are missing between 10:15 and 11:10 (nfcapd.201602111110.csv is next to nfcapd.201602111015.csv)
 
 Initial findings about this data:
-- dir: flow direction: 0 - ingress flow, 1 - egress flow [(1)]; The values under 'dir' are ALL 0. 
-- opkt/obyt: output packets, bytes; The values under 'opkt/obyt' are ALL 0.
-- fwd: forwarding status; The values under 'fwd' are ALL 0, meaning unknown [(1)].
 - The nfcapd dump files are divided into 5min bins, based on the 'tr time': time the flow was received by the controller
    - Ex. dump file with timestamp 2016/01/31 19:15, includes netflow records received between 19:15 and 19:20
    - We could calculate the deviation of the exact time the flow occurs and the observed time window.
-- cl/sl/al: client/server/application latency; The values under 'cl/sl/al' are ALL 0.
+- Non-informative fields:
+  - fwd: forwarding status; The values under 'fwd' are ALL 0, meaning unknown [(1)].
+  - opkt/obyt: output packets, bytes; The values under 'opkt/obyt' are ALL 0.
+  - dtos: the value is 0 for the whole dataset
+  - dir: flow direction: 0 - ingress flow, 1 - egress flow [(1)]; The values under 'dir' are ALL 0. 
+  - nhb: the value is 0.0.0.0 for the whole dataset
+  - svln/dvln: 0/0 for the whole dataset
+  - ismc/odmc/idmc/osmc: the value is 00:00:00:00:00:00 for the whole dataset
+  - mpls1-10: 0-0-0 for the whole dataset
+  - cl/sl/al: client/server/application latency; The values under 'cl/sl/al' are ALL 0.
+  - ra, eng, exid: only one value is listed under these fields for the whole dataset.
 
 [(1)]:http://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html
 
