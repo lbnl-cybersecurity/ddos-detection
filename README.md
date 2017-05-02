@@ -61,6 +61,8 @@ Initial findings about this data:
 Next step: plot entropy timeseries values as shown in this [paper](https://users.ece.cmu.edu/~vsekar/papers/imcfp04-nychis.pdf).
 - based on sa(source address), da(destination address), sp(source port), dp(destination port), and ipkt/ibyt, and tr
 - crosscheck number:
-   - database
+   - database: generate 4022 epochs (from 4022 unit time intervals), matching with 4022 nfcapd dump files collected from router lbl-mr2 
    - direct using csv files
+   
+
 
