@@ -64,5 +64,8 @@ Next step: plot entropy timeseries values as shown in this [paper](https://users
    - database: generate 4022 epochs (from 4022 unit time intervals), matching with 4022 nfcapd dump files collected from router lbl-mr2 
    - direct using csv files
    
+entropyOverTime.py calculates sa/da/sp/dp entropy over time. Unit time is set to be 5mins.
 
+The dataset is labelled with target_ip. 
+Next step: plot number of flows connecting to the target_ip over time
 
