@@ -66,8 +66,14 @@ Next step: plot entropy timeseries values as shown in this [paper](https://users
    
 entropyOverTime.py calculates sa/da/sp/dp entropy over time. Unit time is set to be 5mins.
 
-The dataset is labelled with target_ip. 
+Further findings about this data:
 - it seems like for "ipkt" field, the least report unit is 1000. The value under 'ipkt' is multiples of 1000.
+
+The dataset is labelled with target_ip. 
+Found a great description document about ESnet [pdf](http://www.ece.virginia.edu/mv/MSthesis/tian-jin-thesis2013.pdf)
+- For every new packet corresponding to flow F that is captured by the sampling process, NetFlow adds one to the flow-record packet count and increases the total size (bytes) by the packet-payload size. That explains the case: ipkt=1000, ibyt=21000. Because netflow only captures packet-payload size.
+- In ESnet, the packet sampling rate is 1-in-1000, the active and inactive timeout intervals are 60 sec each, and NetFlow records are exported every 5 mins. Only as a reference, might change now.
+- REN: research and education network
 
 Next step: 
 - plot number of flows connecting to the target_ip over time
