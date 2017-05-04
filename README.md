@@ -67,6 +67,8 @@ Next step: plot entropy timeseries values as shown in this [paper](https://users
 entropyOverTime.py calculates sa/da/sp/dp entropy over time. Unit time is set to be 5mins.
 
 The dataset is labelled with target_ip. 
+- it seems like for "ipkt" field, the least report unit is 1000. The value under 'ipkt' is multiples of 1000.
+
 Next step: 
 - plot number of flows connecting to the target_ip over time
 - traffic volume vs time
