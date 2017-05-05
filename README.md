@@ -66,6 +66,12 @@ Next step: plot entropy timeseries values as shown in this [paper](https://users
    
 entropyOverTime.py calculates sa/da/sp/dp entropy over time. Unit time is set to be 5mins.
 
+There might be a bug in the code as "select" statement is not guaranteed to return rows in order of insertion.
+- re-create the table, with a colume indicating insertion id.
+- crosscheck rows in each file:
+  - from database
+  - directly from csvfiles
+
 Further findings about this data:
 - it seems like for "ipkt" field, the least report unit is 1000. The value under 'ipkt' is multiples of 1000.
 
