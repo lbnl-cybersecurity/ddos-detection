@@ -58,28 +58,30 @@ Initial findings about this data:
 
 [(1)]:http://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html
 
-Next step: plot entropy timeseries values as shown in this [paper](https://users.ece.cmu.edu/~vsekar/papers/imcfp04-nychis.pdf).
-- based on sa(source address), da(destination address), sp(source port), dp(destination port), and ipkt/ibyt, and tr
-- crosscheck number:
-   - database: generate 4022 epochs (from 4022 unit time intervals), matching with 4022 nfcapd dump files collected from router lbl-mr2 
-   - direct using csv files
-   
-entropyOverTime.py calculates sa/da/sp/dp entropy over time. Unit time is set to be 5mins.
-
 There might be a bug in the code as "select" statement is not guaranteed to return rows in order of insertion.
 - re-create the table, with a colume indicating insertion id.
 - crosscheck rows in each file:
   - from database
   - directly from csvfiles
 
-Further findings about this data:
-- it seems like for "ipkt" field, the least report unit is 1000. The value under 'ipkt' is multiples of 1000.
+Next step: 
+- plot entropy timeseries values as shown in this [paper](https://users.ece.cmu.edu/~vsekar/papers/imcfp04-nychis.pdf).
+  - based on sa(source address), da(destination address), sp(source port), dp(destination port), and ipkt/ibyt, and tr
+  - crosscheck number:
+    - database: generate 4022 epochs (from 4022 unit time intervals), matching with 4022 nfcapd dump files collected from router lbl-mr2 
+    - direct using csv files
+- plot traffic volume vs time: pkts / bytes / flows
 
-The dataset is labelled with target_ip. 
+   
+entropyOverTime.py calculates sa/da/sp/dp entropy over time. Unit time is set to be 5mins.
+
 Found a great description document about ESnet [pdf](http://www.ece.virginia.edu/mv/MSthesis/tian-jin-thesis2013.pdf)
 - For every new packet corresponding to flow F that is captured by the sampling process, NetFlow adds one to the flow-record packet count and increases the total size (bytes) by the packet-payload size. That explains the case: ipkt=1000, ibyt=21000. Because netflow only captures packet-payload size.
 - In ESnet, the packet sampling rate is 1-in-1000, the active and inactive timeout intervals are 60 sec each, and NetFlow records are exported every 5 mins. Only as a reference, might change now.
 - REN: research and education network
+
+Further findings about this data:
+- it seems like for "ipkt" field, the least report unit is 1000. The value under 'ipkt' is multiples of 1000.
 
 Next step: 
 - plot number of flows connecting to the target_ip over time
