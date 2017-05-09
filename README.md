@@ -59,10 +59,19 @@ Initial findings about this data:
 [(1)]:http://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html
 
 There might be a bug in the code as "select" statement is not guaranteed to return rows in order of insertion.
-- re-create the table, with a colume indicating insertion id.
+- re-create the table, with a colume indicating insertion id, table name: lbl_mr2_test.
 - crosscheck rows in each file:
   - from database
   - directly from csvfiles
+  - They match.
+    - Using old database created without the "insertion id" colume. 
+    - Using "select" query without "order by".  
+  - They match.
+    - Using old database created without the "insertion id" colume.
+    - Using "select order by rowid" query.
+  - They match.
+    - Using new database with "insertion id"
+    - Using "select order by id" query
 
 Next step: 
 - plot entropy timeseries values as shown in this [paper](https://users.ece.cmu.edu/~vsekar/papers/imcfp04-nychis.pdf).
@@ -72,8 +81,7 @@ Next step:
     - direct using csv files
 - plot traffic volume vs time: pkts / bytes / flows
 
-   
-entropyOverTime.py calculates sa/da/sp/dp entropy over time. Unit time is set to be 5mins.
+
 
 Found a great description document about ESnet [pdf](http://www.ece.virginia.edu/mv/MSthesis/tian-jin-thesis2013.pdf)
 - For every new packet corresponding to flow F that is captured by the sampling process, NetFlow adds one to the flow-record packet count and increases the total size (bytes) by the packet-payload size. That explains the case: ipkt=1000, ibyt=21000. Because netflow only captures packet-payload size.
