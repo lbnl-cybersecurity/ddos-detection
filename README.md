@@ -82,7 +82,6 @@ Next step:
 - plot traffic volume vs time: pkts / bytes / flows
 
 
-
 Found a great description document about ESnet [pdf](http://www.ece.virginia.edu/mv/MSthesis/tian-jin-thesis2013.pdf)
 - For every new packet corresponding to flow F that is captured by the sampling process, NetFlow adds one to the flow-record packet count and increases the total size (bytes) by the packet-payload size. That explains the case: ipkt=1000, ibyt=21000. Because netflow only captures packet-payload size.
 - In ESnet, the packet sampling rate is 1-in-1000, the active and inactive timeout intervals are 60 sec each, and NetFlow records are exported every 5 mins. Only as a reference, might change now.
@@ -93,6 +92,8 @@ Further findings about this data:
 
 Next step: 
 - plot number of flows connecting to the target_ip over time
-- traffic volume vs time
+- All these entropy/volume can be treated as features. We have analyzed these features from the overal traffic perspective, but now we should look to see these features per destination. In this scenario, each flow is an instance with a particular feature pattern (like a dot in the feature space), then we can do clustering and find anomalies. 
+- But how do you know if a feature is effective or not? Even for the same flow, features calcuated at different time intervals are representing different dots in the feature space. With this saying, plotting the feature over time for one particularly flow (with the same destination) can somewhat show us if this feature is a useful indicator for DDoS attack. 
+
 
 
