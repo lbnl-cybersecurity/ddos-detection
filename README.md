@@ -10,8 +10,15 @@ Next step: import these csv files into a database.
 - import a single csv file into the database
 - import a group of csv's into the database
  - crosscheck number of records match: 
-   - 23,460,191 from direct counting csv files
-   - 23,460,191 from counting the database entries
+
+There are three datasets collected from three routers:
+- lbl router
+  - 23,460,191 from direct counting csv files
+  - 23,460,191 from counting the database entries
+- eqx router
+  - 
+- atla router
+
 
 csv2sqlite.py imports csv files into a database.
 
