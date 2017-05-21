@@ -9,14 +9,13 @@ nfTocsv.py converts nfcapd dump files to csv files.
 Next step: import these csv files into a database. 
 - import a single csv file into the database
 - import a group of csv's into the database
- - crosscheck number of records match: 
+- crosscheck number of records match 
 
 There are three datasets collected from three routers:
 - lbl router
   - 23,460,191 from direct counting csv files
   - 23,460,191 from counting the database entries
-- eqx router
-  - 
+- eqx router 
 - atla router
 
 
@@ -42,8 +41,7 @@ General findings about nfdumped csv files:
   - ra, eng, exid: router IP, router engine type/id, exporter sysid
   - tr: time the flow was received by the controller
 
-
-Starting with netflow traces collected from router lbl-mr2. This dataset contains sampled flows from 01/31/2016 - 02/13/2016.
+Starting with netflow traces collected from router lbl-mr2. This dataset contains sampled flows from 01/31/2016 - 02/13/2016 (2 weeks).
 - other than day 02/11, which has 278 dump files, each day has 288 files; 288 = 24*60/5
 - on day 02/11, files are missing between 10:15 and 11:10 (nfcapd.201602111110.csv is next to nfcapd.201602111015.csv)
 
