@@ -18,9 +18,9 @@ There are three datasets collected from three routers:
 - eqx router 
 - atla router
 
-
 csv2sqlite.py imports csv files into a database.
 
+## Netflow Fields
 General findings about nfdumped csv files:
 - 48 fields
   - ts, te, td: time start (first packet seen of this flow), time end(last packet seen of this flow), time duration
@@ -41,6 +41,7 @@ General findings about nfdumped csv files:
   - ra, eng, exid: router IP, router engine type/id, exporter sysid
   - tr: time the flow was received by the controller
 
+## Dataset: lbl-mr2
 Starting with netflow traces collected from router lbl-mr2. This dataset contains sampled flows from 01/31/2016 - 02/13/2016 (2 weeks).
 - other than day 02/11, which has 278 dump files, each day has 288 files; 288 = 24*60/5
 - on day 02/11, files are missing between 10:15 and 11:10 (nfcapd.201602111110.csv is next to nfcapd.201602111015.csv)
@@ -87,6 +88,7 @@ Next step:
 - plot traffic volume vs time: pkts / bytes / flows
 
 
+## A peak into a DDoS Event
 Found a great description document about ESnet [pdf](http://www.ece.virginia.edu/mv/MSthesis/tian-jin-thesis2013.pdf)
 - For every new packet corresponding to flow F that is captured by the sampling process, NetFlow adds one to the flow-record packet count and increases the total size (bytes) by the packet-payload size. That explains the case: ipkt=1000, ibyt=21000. Because netflow only captures packet-payload size.
 - In ESnet, the packet sampling rate is 1-in-1000, the active and inactive timeout intervals are 60 sec each, and NetFlow records are exported every 5 mins. Only as a reference, might change now.
@@ -99,6 +101,14 @@ Next step:
 - plot number of flows connecting to the target_ip over time
 - All these entropy/volume can be treated as features. We have analyzed these features from the overal traffic perspective, but now we should look to see these features per destination. In this scenario, each flow is an instance with a particular feature pattern (like a dot in the feature space), then we can do clustering and find anomalies. 
 - But how do you know if a feature is effective or not? Even for the same flow, features calcuated at different time intervals are representing different dots in the feature space. With this saying, plotting the feature over time for one particularly flow (with the same destination) can somewhat show us if this feature is a useful indicator for DDoS attack. 
+
+
+## An anlysis on the 3 available DDoS Events
+
+Instead of plotting the traffic attributes over a span of two-weeks, we first focus on the time when there was a DDoS event. (The size of database is much smaller)
+
+
+
 
 
 
