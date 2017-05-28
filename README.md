@@ -105,12 +105,17 @@ Next step:
 
 ## An anlysis on the 2 available DDoS Events
 
-Instead of plotting the traffic attributes over a span of two-weeks, we first focus on the time when there was a DDoS event. (The size of database is much smaller).
+Instead of plotting the traffic attributes over a span of two-weeks, we first focus on the time when there was a DDoS event, and retrieve all sampled Netflow records destined toward the attack destination. (The size of database is much smaller).
 
 DDoS Event #2:
 We select a time span of 3 days (2016-12-29/30/31). The target ip is 192.107.175.71. The traces are collected both from router alta-cr5 and router eqx-ash-rt1. 
 
-
+Table #1 shows the percentage contribution of protocols in this time span of traffic. 
+| Protocol | Pctg (%) |
+|:--------:|:---------|
+| TCP      |0         |
+| UDP      |0         |
+| ICMP     |0         |
 
 
 
