@@ -103,9 +103,12 @@ Next step:
 - But how do you know if a feature is effective or not? Even for the same flow, features calcuated at different time intervals are representing different dots in the feature space. With this saying, plotting the feature over time for one particularly flow (with the same destination) can somewhat show us if this feature is a useful indicator for DDoS attack. 
 
 
-## An anlysis on the 3 available DDoS Events
+## An anlysis on the 2 available DDoS Events
 
-Instead of plotting the traffic attributes over a span of two-weeks, we first focus on the time when there was a DDoS event. (The size of database is much smaller)
+Instead of plotting the traffic attributes over a span of two-weeks, we first focus on the time when there was a DDoS event. (The size of database is much smaller).
+
+DDoS Event #2:
+We select a time span of 3 days (2016-12-29/30/31). The target ip is 192.107.175.71. The traces are collected both from router alta-cr5 and router eqx-ash-rt1. 
 
 
 
