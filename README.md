@@ -111,6 +111,7 @@ DDoS Event #2:
 We select a time span of 3 days (2016-12-29/30/31). The target ip is 192.107.175.71. The traces are collected both from router alta-cr5 and router eqx-ash-rt1. 
 
 Table #1 shows the percentage contribution of protocols in this time span of traffic. 
+
 | Protocol | Pctg (%) |
 |:--------:|:---------|
 | TCP      |0         |
