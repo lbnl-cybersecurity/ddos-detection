@@ -1,7 +1,15 @@
 #!/usr/bin/python
 """
     Load csv files into sqlite database
-    Usage: ./csv2sqlite.py
+
+    :param sqlite_file: Name of sqlite file opened
+    :param table_name: Database name to be written to
+    :param user_fileslist: customized csv fileslist to load netflow records from
+    
+    Example:
+        from scripts.lbl_mr2 import user_fileslist, user_sqlite_file, user_table_name
+        ./csv2sqlite.py
+    
     customized csv fileslist is feeded in this script 
 """
 import csv
@@ -9,18 +17,29 @@ import sys
 import os
 import sqlite3
 import time
-from scripts.atla_eqx_ddos_span import user_fileslist
+
+""" Feed customized csv fileslist """
+#from scripts.atla_eqx_ddos_span import user_fileslist, user_sqlite_file, user_table_name
+from scripts.lbl_mr2 import user_fileslist, user_sqlite_file, user_table_name
+
 # Convert strings to int/float data type
 options = [('TEXT', str), ('INTEGER', int), ('REAL', float)]
 options = dict(options)
 cast = []
+# Filter out stats reporting lines in csv files 
 NO_NETFLOW_FIELDS = 48
 
 # Global counter tracking file_id:
-# Traces from the same file have the same file_id
+# Netflow records from the same file have the same file_id
 file_id = 0
 # Global indicator of router name
 rname = ''
+
+# Filter records
+# Only select records whose dest_ip == target_ip
+FLG_TARGET_FILTER = False
+target_ip = '192.107.175.71'
+dst_ip_index = 4
 
 def chunks(data, rows=10000):
     """ Divides the data into 10000 rows each """
@@ -29,11 +48,14 @@ def chunks(data, rows=10000):
 
 def import_csv(conn, cursor, table_name, infile):
     global file_id, rname
+    global FLG_TARGET_FILTER, target_ip, dst_ip_index
     with open(infile, 'rb') as ff:
         next(ff)
         csvData = csv.reader(ff)
         func = lambda line: [cast[i](x) for i, x in enumerate(line)]
         newData = [func(line) for line in csvData if len(line) == NO_NETFLOW_FIELDS]
+        if FLG_TARGET_FILTER: 
+            newData = [line for line in newData if line[dst_ip_index] == target_ip]
         divData = chunks(newData)
 
         # Inserting rows
@@ -47,19 +69,16 @@ def import_csv(conn, cursor, table_name, infile):
                     print "Error on line %s: %s" % (row, e)
             conn.commit()
 
-def getFileList(rootDir, csvFiles):
-    for dirname, subdirList, fileList in os.walk(rootDir, topdown=False):
-        csvFiles += [os.path.join(dirname,k) for k in fileList if 'csv' in k and os.path.isfile(os.path.join(dirname, k))]
 
 def main():
     global file_id, rname
     # Connecting to the database file
-    sqlite_file = 'ddos.sqlite'
+    sqlite_file = user_sqlite_file
     conn = sqlite3.connect(sqlite_file)
     c = conn.cursor()
 
     # Creating a table
-    table_name = 'atla_eqx_combined_ddos'
+    table_name = user_table_name
     schema_file = 'nfdumpFields.txt'
     _columns = []
     with open(schema_file, 'rb') as ff:
@@ -76,12 +95,6 @@ def main():
     # Committing changes
     conn.commit()
 
-    # Prepare a list of csv files to be imported to the database
-    #rootDir = sys.argv[1]
-    #csvFiles = []
-    #getFileList(rootDir, csvFiles)
-    # Important!!! sort csvFiles list in time order
-    #csvFiles = sorted(csvFiles) 
     csvFiles = user_fileslist
     print "Num of csv files to be imported into database: %d" % len(csvFiles)
 
