@@ -114,10 +114,15 @@ Table #1 shows the percentage contribution of protocols in this time span of tra
 
 | Protocol | Pctg (%) |
 |:--------:|:---------|
-| TCP      |0         |
-| UDP      |0         |
-| ICMP     |0         |
+| TCP      |33.47     |
+| UDP      |33.26     |
+| ICMP     |33.27     |
 
 
-
+## Automated DDoS Detection System
+Because the netflow records are sampled, it is not guarantteed that packets belong to both direction of a flow are captured. But again we would like to have a roughly estimate. We collect all the unique "source address" and "destination address" appearing within a unit time interval, and calculate the overlapping percentage. The result is shown below:
+```
+overlap: 452, total_sa: 1839, total_da: 1845.
+```
+The overlapping percentage is about 24.6%.
 
