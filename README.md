@@ -103,7 +103,7 @@ Next step:
 - But how do you know if a feature is effective or not? Even for the same flow, features calcuated at different time intervals are representing different dots in the feature space. With this saying, plotting the feature over time for one particularly flow (with the same destination) can somewhat show us if this feature is a useful indicator for DDoS attack. 
 
 
-## An anlysis on the 2 available DDoS Events
+## An anlysis on the 2nd available DDoS Events
 
 Instead of plotting the traffic attributes over a span of two-weeks, we first focus on the time when there was a DDoS event, and retrieve all sampled Netflow records destined toward the attack destination. (The size of database is much smaller).
 
