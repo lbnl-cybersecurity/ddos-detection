@@ -1,5 +1,7 @@
 # ddos-detection
 
+1) [Part1](./readme_part1.md): Preliminary data analysis.
+
 ## Automated DDoS Detection System
 Because the netflow records are sampled, it is not guarantteed that packets belong to both direction of a flow are captured. But again we would like to have a roughly estimate. We collect all the unique "source address" and "destination address" appearing within a unit time interval, and calculate the overlapping percentage. The result (from the first 5min monitoring interval of lbl_mr2 dataset) is shown below:
 ```
