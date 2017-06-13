@@ -18,7 +18,7 @@ There are three datasets collected from three routers:
 - eqx router 
 - atla router
 
-csv2sqlite.py imports csv files into a database.
+[csv2sqlite.py](./csv2sqlite.py) imports csv files into a database.
 
 ## Netflow Fields
 General findings about nfdumped csv files:
@@ -125,9 +125,10 @@ Because the netflow records are sampled, it is not guarantteed that packets belo
 overlap: 452, total_sa: 1839, total_da: 1845.
 ```
 The overlapping percentage is about 24.6%.
-We care more of protecting the ESnet from being DDoSed than attacking traffic originates from ESnet. Then one related question is that what IP ranges belong to ESnet. 
+We care more of protecting the ESnet from being DDoSed than that attacking traffic originates from ESnet. Then one related question is that what IP ranges belong to ESnet. 
 
 ### Simple Volume-based Anomaly Detector
 It is not scalable to track the aggregated traffic volume per destination for each destination appearing in a unit time interval. We are more interested in defending us from being DDoSed, than us generating DDoS traffic (under the assumption that our computers are managed by professional people). We are more interested in the IPs which we care for (i.e. from ESnets or Sites). 
 
+--- Make my code more readable: follow the annotation style.---
 
