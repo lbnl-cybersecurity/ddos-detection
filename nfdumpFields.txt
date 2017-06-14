@@ -47,3 +47,5 @@ ra,TEXT,route IP
 eng,TEXT,router engine type/id
 exid,INTEGER,exporter SysID
 tr,TEXT,time the flow was received by the collector in a format like "YYYY-MM-DD HH:MM:SS.SSS"
+file_id,INTEGER,an identifier for rows from the same file
+rname,TEXT,router name collecting this trace
