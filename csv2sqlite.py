@@ -99,9 +99,6 @@ def main():
     print "Num of csv files to be imported into database: %d" % len(csvFiles)
 
     # Inserting records
-    ### Test with a single csv file
-    #csvFiles = ['test.csv']
-    ### end Test
     start_time = time.time()
     total = len(csvFiles)
     grid = max(total/20, 1)
