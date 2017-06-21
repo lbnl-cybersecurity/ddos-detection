@@ -1,0 +1,9 @@
+Field,Type,Descp
+sa,TEXT,source IP
+da,TEXT,destination IP
+pr,TEXT,protocol
+sp,INTEGER,source port
+dp,INTEGER,destination port
+octs,INTEGER,octets
+pkts,INTEGER,packets associated with an IP flow
+count,INTEGER,file number
