@@ -10,6 +10,8 @@ The features are per dst_ip based.
     usage: 
         edit the FEATURES_MAP to specify features to be included.
         python create_features.py
+    output:
+        A csv-like file with a list of formatted rows.
 
 """
 import sys
@@ -21,6 +23,8 @@ logging.basicConfig(stream = sys.stdout, level = logging.DEBUG)
 
 from nfreader import RecordReader, FIELDS
 from features_one import get_pkts, get_byts, get_uniq_srcip, get_uniq_sas
+from features_two import get_tcp_pkts, get_uniq_tcp_srcip, get_uniq_tcp_sas, get_tcp_syn_ratio
+from features_three import get_tcp_syn_pkts, get_uniq_srcip_tcp_syn, get_uniq_sas_tcp_syn
 
 idx_da = FIELDS.index("da")
 idx_fileid = FIELDS.index("file_id")
@@ -31,7 +35,14 @@ FEATURES_MAP = {
     "pkts" : get_pkts,
     "byts" : get_byts,
     "uniq_srcip": get_uniq_srcip,
-    "uniq_sas": get_uniq_sas
+    "uniq_sas": get_uniq_sas,
+    "tcp_pkts": get_tcp_pkts,
+    "uniq_tcp_srcip": get_uniq_tcp_srcip,
+    "uniq_tcp_sas": get_uniq_tcp_sas,
+    "tcp_syn_ratio": get_tcp_syn_ratio,
+    "tcp_syn_pkts": get_tcp_syn_pkts,
+    "uniq_srcip_tcp_syn": get_uniq_srcip_tcp_syn,
+    "uniq_sas_tcp_syn": get_uniq_sas_tcp_syn
 }
 #--------------------------------------------------------------#
 
