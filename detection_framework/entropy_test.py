@@ -11,6 +11,7 @@ import csv
 import getopt
 import collections
 import shutil
+import logging
 from subprocess import call
 from math import log
 
@@ -30,6 +31,7 @@ class Entropy:
 		self.target_flows = 0
 		self.target = "204.38.0.0/21"
 		self.flow_count = 0
+		self.log_entry = ""
 
 
 	# Record the log file
@@ -55,6 +57,7 @@ class Entropy:
     		row = [count]
     		#print("calculating entropy for file %d",count)
     		### calculate current entropy
+		self.log_entry = ""
     		for field in self.options:
                 	#print(field)
                 	hx = 0
@@ -85,13 +88,14 @@ class Entropy:
                                 	#print(element)
 				if field in "da":
                         		print(hx_norm)
-                        	if field in "da" and hx_norm < 0.25:
-                                	print(topIP,topDest)
-                                	print("Potential DDoS attack found")
+                        	if field in "da" and hx_norm < 0.95: #0.25:
+					self.log_entry = "%s, %s, low entropy: %s, potential DDoS attack" % (topIP, topDest, hx_norm)
+                                	#print(topIP,topDest)
+                                	#print("Potential DDoS attack found")
                                 	#ff = open(outfile, 'ab')
-                                	print("Target is: ", topIP, " Volume", topDest)
-                                	print(" Entropy: ", hx)
-                                	print(" Potential DDoS attack found\n")
+                                	#print("Target is: ", topIP, " Volume", topDest)
+                                	#print(" Entropy: ", hx)
+                                	#print(" Potential DDoS attack found\n")
     
 	def dump2(self, count):
     		row = [count]

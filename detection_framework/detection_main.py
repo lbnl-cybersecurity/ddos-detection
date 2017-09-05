@@ -38,6 +38,9 @@ global stop_threads
 SIZE_OF_HEADER = 24
 SIZE_OF_RECORD = 48
 
+# Location of nfcapd files to be tested
+nf_directory = "" 
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', 2346))
 flow_count = 0
@@ -45,7 +48,6 @@ start_time = 0
 #current_time = 0
 test_count = 1
 nf_directory = '.'
-
 
 # Detection variables
 bin_size = 5*60                   # seconds
@@ -95,7 +97,7 @@ def find_new_files():
 	    nfDumpFiles = []
 
 
-	    dump_directory = nf_directory + "/nfdump"
+	    dump_directory = nfdump #nf_directory + "/nfdump"
 	    #print dump_directory
             file_count = 0
             # Add each new nf_dump file to a list for testing
@@ -116,6 +118,8 @@ def find_new_files():
 
 # Update a queue of nfdump files to be read by the detector
 def read_nfcapd(current_time):
+    global nf_directory
+
     file_queue = deque()
 
     #print threading.currentThread().getName(), 'Read nfcapd()'
@@ -132,9 +136,10 @@ def read_nfcapd(current_time):
 
     file_count = 0
     # For each new nfcapd file, get nfdump, then read nfdump and run the test
-    cmd = ['nfdump', '-o', 'csv', '-r', 0]
-    nf_directory = "."
-    for dirname, subdirList, fileList in os.walk("."): #, topdown=False):
+    cmd = ['../nfdump/bin/nfdump', '-o', 'csv', '-r', 0]
+
+    #nf_directory = "."
+    for dirname, subdirList, fileList in os.walk(nf_directory): #, topdown=False):
 		#print "reached files"
                 fileList = [k for k in fileList if 'nfcapd' in k and not 'csv' in k]
 		#print fileList
@@ -161,14 +166,17 @@ def read_nfcapd(current_time):
 					lock.acquire()
 					try:
 						print abs_csv_fname
+						print abs_fname
                                 		with open(abs_csv_fname, 'wb') as ff:
-                                        		call(cmd, stdout=ff)
+                                        		print "0"
+							call(cmd, stdout=ff)
+							print "1"
 					finally:
 						lock.release()
 	
 				# add the new nfdump file to the queue
 				file_queue.append(abs_csv_fname)
-				#print "reached"
+				print "reached"
                                 current_time = os.path.getmtime(abs_fname)
     file_queue.append(current_time)
     return file_queue
@@ -187,14 +195,16 @@ def dns_ampl_test(t):
     	file_queue = deepcopy(read_nfcapd(current_time))
     	while len(file_queue) > 1:
              nfdump_file = file_queue.popleft()
-             print("dns", nfdump_file)
+             #print("dns", nfdump_file)
 
              # Run the test here on each file in the queue
              entropy_tester.detect_entropy(nfdump_file)
+	     logging.info(entropy_tester.log_entry)
 
     	if len(file_queue) == 1:
              current_time = file_queue.popleft()
-	logging.info('entropy')
+	if entropy_tester.log_entry != "":
+		logging.info(entropy_tester.log_entry)
     logging.info('finished entropy')
 
 def wavelet_test(t):
@@ -233,6 +243,31 @@ def detection_test(name, nfdump_file):
         print nfdump_file	
 
 def main(argv):
+
+    # use /project/projectdirs/hpcsecure/ddos/lbl-mr2-anon/2016/01/31/ for testing
+    global nf_directory
+    log_file = ""
+
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+    except getopt.GetoptError:
+        print 'detect.py -i <netflow directory> -o <log name>'
+        sys.exit(2)
+    if len(sys.argv) < 5:
+        print 'detect.py -i <netflow directory> -o <log name>'
+	sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+                print 'detect.py -i <netflow directory> -o <log name>'
+                sys.exit()
+        elif opt in ("-i", "--directory"):
+                nf_directory = arg
+        elif opt in ("-o", "--log"):
+                log_file = arg
+    print 'nfcapd directory is ', nf_directory
+    print 'logfile name is ', log_file
+
+
     print ("starting threads")
 
     # set up the logging
@@ -242,12 +277,12 @@ def main(argv):
     logger = logging.getLogger() # this gets the root logger
 
     lhStdout = logger.handlers[0]  # stdout is the only handler initially
-    #f = open("results.log","w")          # example handler
+    #f = open(log_file,"w")          # example handler
     #lh = logging.StreamHandler(f)
     #logger.addHandler(lh)
     
 
-    file_handler = logging.FileHandler('results.log')
+    file_handler = logging.FileHandler(log_file)
     file_handler.setFormatter(logging.Formatter(FORMAT))
     logging.getLogger().addHandler(file_handler)
     logger.removeHandler(lhStdout)
