@@ -38,6 +38,9 @@ global stop_threads
 SIZE_OF_HEADER = 24
 SIZE_OF_RECORD = 48
 
+NUM_TESTS = 2 
+
+
 # Location of nfcapd files to be tested
 nf_directory = "" 
 
@@ -48,6 +51,11 @@ start_time = 0
 #current_time = 0
 test_count = 1
 nf_directory = '.'
+
+# track the nfdump files so they can be deleted once all threads have processed them
+completed_files = dict()
+completed_files_lock = threading.Lock()
+files_tested = 0
 
 # Detection variables
 bin_size = 5*60                   # seconds
@@ -84,37 +92,6 @@ def compare_times(file1, file2):
         	return 0
     return 0
 
-# Return a list of unread nfdump files, in order
-def find_new_files():
-# Read from a queue made by other function instead
-            global start_time
-            global current_time
-	   
-
-            # Read from the nfcapd files in the chosen directory
-            sortedFiles = []
-            fileTimes = []
-	    nfDumpFiles = []
-
-
-	    dump_directory = nfdump #nf_directory + "/nfdump"
-	    #print dump_directory
-            file_count = 0
-            # Add each new nf_dump file to a list for testing
-            for dirname, subdirList, fileList in os.walk(dump_directory, topdown=False):
-                fileList = [k for k in fileList if 'nfcapd' in k and 'csv' in k]
-                fileList = sorted(fileList, cmp=compare_times)
-                for fname in fileList:
-                        abs_fname = os.path.abspath(os.path.join(dirname,fname)) 
-			#print fname	
-
-                        # Test only newly added nfcapd files
-                        if current_time < os.path.getmtime(abs_fname):
-				print fname[0]
-				nfDumpFiles.append(abs_fname)
-                                current_time = os.path.getmtime(abs_fname)
-	    return nfDumpFiles
-
 
 # Update a queue of nfdump files to be read by the detector
 def read_nfcapd(current_time):
@@ -140,10 +117,12 @@ def read_nfcapd(current_time):
 
     #nf_directory = "."
     for dirname, subdirList, fileList in os.walk(nf_directory): #, topdown=False):
-		#print "reached files"
                 fileList = [k for k in fileList if 'nfcapd' in k and not 'csv' in k]
-		#print fileList
-                fileList = sorted(fileList, cmp=compare_times)
+
+                for i in range(len(fileList)):
+			fileList[i] = os.path.abspath(os.path.join(dirname, fileList[i]))
+		fileList = sorted(fileList, cmp=self.compare_times)
+
                 for fname in fileList:
                         abs_fname = os.path.abspath(os.path.join(dirname, fname))
                         cmd[4] = abs_fname
@@ -152,8 +131,6 @@ def read_nfcapd(current_time):
                         # Test only newly added nfcapd files
                         if current_time < os.path.getmtime(abs_fname):
                                 #file_count += 1
-                                #print(file_count)
-                                #print("last modified: %s" % time.ctime(os.path.getmtime(abs_fname)))
                                 # Create an nfdump file                       
                                 copy_dirname = 'nfdump'
 				#fname = str(file_count) + fname
@@ -165,30 +142,45 @@ def read_nfcapd(current_time):
 				if os.path.isfile(abs_csv_fname) == False:
 					lock.acquire()
 					try:
-						print abs_csv_fname
-						print abs_fname
                                 		with open(abs_csv_fname, 'wb') as ff:
-                                        		print "0"
 							call(cmd, stdout=ff)
-							print "1"
 					finally:
 						lock.release()
 	
 				# add the new nfdump file to the queue
 				file_queue.append(abs_csv_fname)
-				print "reached"
                                 current_time = os.path.getmtime(abs_fname)
     file_queue.append(current_time)
     return file_queue
-     		
+   
+# delete the nfdump files once all detection threads have finished processing them  	
+# detection threads should indication the completion of a file by calling this function	
+def nfdump_complete(nfdump_file):
+    global files_tested
+    global completed_files
+
+    completed_files_lock.acquire()
+    try:
+			completed_files[nfdump_file] = completed_files.get(nfdump_file, 0) + 1
+			# if the count is equal to the number of detection threads, file is no longer needed
+			if completed_files[nfdump_file] >= NUM_TESTS:
+				os.remove(nfdump_file)
+				files_tested += 1
+				print ("file %d tested" % files_tested)
+    finally:
+			completed_files_lock.release()
+
+
 # Detection Threads
 # One thread for each type of detection test
 # Later add option to enable/disable certain tests
 def dns_ampl_test(t):
+    current_time = 0
+
+    print threading.currentThread().getName(), 'Starting'
     while not t.is_stop_requested():
     	entropy_tester = Entropy()
-    	current_time = 0
-    	print threading.currentThread().getName(), 'Starting'
+    	
     	time.sleep(2)
     	file_queue = deque()
     	time.sleep(2)
@@ -201,6 +193,10 @@ def dns_ampl_test(t):
              entropy_tester.detect_entropy(nfdump_file)
 	     logging.info(entropy_tester.log_entry)
 
+	     # update the completed_files dict to indicate the thread has completed processing this file
+	     nfdump_complete(nfdump_file)
+	     
+
     	if len(file_queue) == 1:
              current_time = file_queue.popleft()
 	if entropy_tester.log_entry != "":
@@ -208,20 +204,25 @@ def dns_ampl_test(t):
     logging.info('finished entropy')
 
 def wavelet_test(t):
+    current_time = 0
+    
+    print threading.currentThread().getName(), 'Starting'
     while not t.is_stop_requested():
     	#entropy_tester = Entropy()
-    	current_time = 0
-    	print threading.currentThread().getName(), 'Starting'
+
+    	
     	time.sleep(3)
     	file_queue = deque()
     	time.sleep(2)
     	file_queue = deepcopy(read_nfcapd(current_time))
     	while len(file_queue) > 1:
             nfdump_file = file_queue.popleft()
-            print("wavelet", nfdump_file)
 
             # Insert wavelet test code here
             #entropy_tester.detect_entropy(nfdump_file)
+
+	    # remove the completed files 
+	    nfdump_complete(nfdump_file)
 
 
     	if len(file_queue) == 1:
@@ -287,11 +288,16 @@ def main(argv):
     logging.getLogger().addHandler(file_handler)
     logger.removeHandler(lhStdout)
 
-    # start the threads!
+    # start the detection threads
     t1 = InterruptableThread(dns_ampl_test)
     t2 = InterruptableThread(wavelet_test)
     t1.start()
     t2.start()
+
+    # keep checking the nfcapd directory for new files, convert to csv and add them to a shared queue for the detection tests
+    
+
+
     t1.join()
     t2.join() 
 
