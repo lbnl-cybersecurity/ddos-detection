@@ -25,6 +25,7 @@ from socket import inet_ntoa
 from Queue import Queue
 from collections import deque
 from entropy_test import *
+from wavelet_test import *
 from detection_tests import *
 from netflow_classes import * 
 from copy import deepcopy
@@ -58,12 +59,12 @@ def main(argv):
     # start the detection threads
     detection_tester.configure_log()
     #detection_tester.run_threads()
-    detection_tester.test_count = 2
-    t1 = InterruptableThread(detection_tester.dns_ampl_test)
-    t2 = InterruptableThread(detection_tester.wavelet_test)
-    t1.start()
+    detection_tester.test_count = 1 # number of nfdump-based tests, for removing the finished files
+    #t1 = InterruptableThread(detection_tester.dns_ampl_test)
+    t2 = InterruptableThread(detection_tester.wavelet_test2)
+    #t1.start()
     t2.start()
-    t1.join()
+    #t1.join()
     t2.join()
 
  
