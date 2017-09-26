@@ -22,6 +22,7 @@ from socket import inet_ntoa
 from Queue import Queue
 from collections import deque
 from entropy_test import *
+from wavelet_test import *
 from netflow_classes import * 
 from copy import deepcopy
 
@@ -61,6 +62,46 @@ class DetectionTester:
         	return 0
     	return 0
 
+    # Update a queue of nfdump files to be read by the detector
+    def get_nfcapd(self, current_time):
+    	file_queue = deque()
+
+    	#print threading.currentThread().getName(), 'Read nfcapd()'
+    
+
+    	lock = threading.Lock()
+
+    	file_count = 0
+     
+    	# Read from the nfcapd files in the chosen directory
+    	sortedFiles = []
+    	fileTimes = []
+    	nfDumpFiles = []
+	abs_dirname = ""
+
+    	file_count = 0
+    	# For each new nfcapd file, get nfdump, then read nfdump and run the test
+    	#nf_directory = "."
+    	for dirname, subdirList, fileList in os.walk(self.nf_directory): #, topdown=False):
+                fileList = [k for k in fileList if 'nfcapd' in k and not 'csv' in k]
+	
+		for i in range(len(fileList)):
+			fileList[i] = os.path.abspath(os.path.join(dirname, fileList[i]))
+		fileList = sorted(fileList, cmp=self.compare_times)
+
+		abs_dirname = os.path.abspath(dirname)
+                for fname in fileList:
+                        abs_fname = os.path.abspath(os.path.join(dirname, fname))
+
+			#print "test"
+                        # Add only newly added nfcapd files
+                        if current_time < os.path.getmtime(abs_fname):
+				# add the new nfcapd file to the queue
+				#name = abs_fname.replace(os.path.abspath(dirname),'')
+				file_queue.append(abs_fname) 
+                                current_time = os.path.getmtime(abs_fname)
+    	file_queue.append(current_time)
+    	return file_queue
 
     # Update a queue of nfdump files to be read by the detector
     def read_nfcapd(self, current_time):
@@ -102,14 +143,14 @@ class DetectionTester:
                                 copy_dirname = 'nfdump'
 				#fname = str(file_count) + fname
                                 abs_csv_fname = os.path.abspath(os.path.join(copy_dirname, fname)) + '.csv'
-                                
+                                #print abs_csv_fname
 				# Use a lock to prevent two threads from writing
 				# the same nfdump file
 				
 				if os.path.isfile(abs_csv_fname) == False:
 					self.file_lock.acquire()
 					try:
-                                		with open(abs_csv_fname, 'wb') as ff:
+                                		with open(abs_csv_fname, 'wb') as ff:  
 							call(cmd, stdout=ff)
 					finally:
 						self.file_lock.release()
@@ -171,7 +212,7 @@ class DetectionTester:
 
     def wavelet_test(self, t):
     	current_time = 0
-    
+
     	print threading.currentThread().getName(), 'Starting'
     	while not t.is_stop_requested():
     		#entropy_tester = Entropy()
@@ -181,7 +222,7 @@ class DetectionTester:
     		file_queue = deque()
     		time.sleep(2)
     		file_queue = deepcopy(self.read_nfcapd(current_time))
-    		while len(file_queue) > 1:
+    		while len(file_queue) > 2:
             		nfdump_file = file_queue.popleft()
 
             		# Insert wavelet test code here
@@ -190,12 +231,33 @@ class DetectionTester:
 	    		# remove the completed files 
 	    		self.nfdump_complete(nfdump_file, "Wav")
 
-
     		if len(file_queue) == 1:
             		current_time = file_queue.popleft()
 		#logging.info('wavelet')
     	#logging.info('done wavelet')
 
+    def wavelet_test2(self, t):
+    	current_time = 0
+    
+    	print threading.currentThread().getName(), 'Starting'
+    	while not t.is_stop_requested():
+    		wavelet_tester = Wavelet()
+		time.sleep(1)
+    		file_queue = deque()
+    		file_queue = deepcopy(self.get_nfcapd(current_time))
+    		while len(file_queue) > 1:
+            		nfcapd_file = file_queue.popleft()
+
+            		# Insert wavelet test code here
+            		wavelet_tester.list_of_files.append(nfcapd_file)
+			wavelet_tester.run_wavelet()
+			if wavelet_tester.log_entry != "":
+				logging.info(wavelet_tester.log_entry)
+
+    		if len(file_queue) == 1:
+            		current_time = file_queue.popleft()
+		#logging.info('wavelet')
+    	#logging.info('done wavelet')
 
     def tcp_syn_test(self, t):
     	print threading.currentThread().getName(), 'Starting'
@@ -203,9 +265,9 @@ class DetectionTester:
     	print threading.currentThread().getName(), 'Exiting'	
 
     def run_threads(self):
-	self.test_count = 2
+	self.test_count = 1
 	t1 = InterruptableThread(self.dns_ampl_test)
-    	t2 = InterruptableThread(self.wavelet_test)
+    	t2 = InterruptableThread(self.wavelet_test2)
     	t1.start()
     	t2.start()
 	t1.join()
