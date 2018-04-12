@@ -1,0 +1,12 @@
+- python extract_udp.py
+    outfiles:
+    - target_udp_traffic.csv: UDP traffic to/from target ip
+    - target_dns.csv: DNS traffic to target ip
+- python pkts.py
+    - count UDP/DNS packets/bytes to target ip every 5min time interval
+    - Time starts from beginning of file
+- python attack_anal.py
+    - count DNS packets/bytes to target ip every 5min time interval
+    - count dst ports of target ip DNS traffic access every 5min time interval
+    - count src ips among DNS traffic to target ip every 5min time interval
+    - Time starts from beginning of file
