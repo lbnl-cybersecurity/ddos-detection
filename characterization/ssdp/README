@@ -1,0 +1,12 @@
+- python extract_udp.py
+    outfiles:
+    - target_udp_traffic.csv: UDP traffic to/from target ip
+    - target_ssdp.csv: SSDP traffic to target ip
+- python pkts.py
+    - count UDP/SSDP packets/bytes to target ip every 5min time interval
+    - Time starts from beginning of file
+- python attack_anal.py
+    - count SSDP packets/bytes to target ip every 5min time interval
+    - count dst ports of target ip SSDP traffic access every 5min time interval
+    - count src ips among SSDP traffic to target ip every 5min time interval
+    - Time starts from beginning of file
