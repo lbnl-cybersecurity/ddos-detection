@@ -1,0 +1,12 @@
+- python extract_udp.py
+    outfiles:
+    - target_udp_traffic.csv: UDP traffic to/from target ip
+    - target_chargen.csv: CHARGEN traffic to target ip
+- python pkts.py
+    - count UDP/CHARGEN packets/bytes to target ip every 5min time interval
+    - Time starts from beginning of file
+- python attack_anal.py
+    - count CHARGEN packets/bytes to target ip every 5min time interval
+    - count dst ports of target ip CHARGEN traffic access every 5min time interval
+    - count src ips among CHARGEN traffic to target ip every 5min time interval
+    - Time starts from beginning of file
