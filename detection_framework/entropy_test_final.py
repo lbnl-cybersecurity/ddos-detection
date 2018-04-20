@@ -37,10 +37,9 @@ class Entropy:
 		self.total_flows = 0
 		
 		# Settings
-		self.feature = "da"
+		self.feature = "sp"
 		self.data_type = "netflow"
 		self.ent_type = "avg_size"
-		self.threshold = "0.3"
 
 	# Record the log file
 	def write2file(self):
@@ -82,7 +81,6 @@ class Entropy:
 					total2 += self.curr_s_dict[field][element]	
 				#print total2
 			#print "total1 %d" % (total)
-			#print field
                 	for element in self.curr_s_dict[field]:
                         	#  update destinationCounter to get top destinations
                         	nx = self.curr_s_dict[field][element]
@@ -98,9 +96,9 @@ class Entropy:
                         	px = nx/float(total)
 				if px != 0:
                         		hx += -1*px*log(px, 2)
-				#else:
-					#print field
-					#print "no"
+				else:
+					print field
+					print "no"
                 	N0 = log(len(self.curr_s_dict[field]), 2)
                 	#print(N0)
                 
@@ -109,19 +107,16 @@ class Entropy:
                         	# check thresholds here
 
                         	ent_result += str(hx_norm)
-				#if field in "dp":
-				#	print ent_result
-				#else:
-				#	ent_result += ","
+				if field in "dp":
+					print ent_result
+				else:
+					ent_result += ","
 					#if hx_norm == 1.0:
 						#print self.curr_s_dict['da']
-				#print hx_norm
                         	if field in self.feature:
-					if hx_norm <= 0.3:#self.threshold:
+					if hx_norm <= self.threshold:
 						self.log_entry = "%s, %s, low entropy: %s, potential DDoS attack" % (topIP, topDest, hx_norm)
-                                		print self.log_entry
-					else:
-						print "normal entropy %s" % (hx_norm)	
+                                	
 	def dump2(self, count):
     		row = [count]
     		print("Recording blank file", count)
@@ -150,24 +145,23 @@ class Entropy:
     		
     		for i, field in enumerate(self.options):
             		#count(field, row[i], row[5])
-			#print field
             		if not field in self.curr_s_dict:
                 		self.curr_s_dict[field] = {}
 
             		if not row[i] in self.curr_s_dict[field]:
 				if self.ent_type == "avg_size":
                				self.curr_s_dict[field][row[i]] = row[5]/row[6]
-				elif self.ent_type == "pkt_size":
+				else if self.ent_type == "pkt_size":
 					self.curr_s_dict[field][row[i]] = row[5]
-				elif self.ent_type == "pkt_count":
+				else if self.ent_type == "pkt_count":
 					self.curr_s_dict[field][row[i]] = row[6]
 				#print self.curr_s_dict[field][row[i]]
             		else:
 				if self.ent_type == "avg_size":
                 			self.curr_s_dict[field][row[i]] += row[5]/row[6]
-				elif self.ent_type == "pkt_size":
+				else if self.ent_type == "pkt_size":
 					self.curr_s_dict[field][row[i]] += row[5]
-				elif self.ent_type == "pkt_count":
+				else if self.ent_type == "pkt_count":
 					self.curr_s_dict[field][row[i]] += row[6]
 
 			if self.curr_s_dict[field][row[i]] == 0:
@@ -189,8 +183,7 @@ class Entropy:
                         		ent_data.append(row[5]) # src port
                         		ent_data.append(row[6]) # dst port
                         		ent_data.append(row[11]) # packet count
-                        		ent_data.append(int(row[11]) # count
-					ent_data.append(int(row[13]) # flows
+                        		ent_data.append(count) # count
                         		#print(ent_data)
                         		self.entropy(ent_data)
                 		count += 1
@@ -250,11 +243,11 @@ class Entropy:
 					#pkts
                         		ent_data.append(int(row2[5])) # count (next try entropy using packet size?)
 					ent_data.append(int(row2[6])) # 5 = octets/size, 6 = packet count
-					#if row2[1] == "35.7.72.0" or row2[0] == "35.7.72.0":
+					if row2[1] == "35.7.72.0" or row2[0] == "35.7.72.0":
 					
-					self.entropy(ent_data)
-					self.total_pkts += int(row2[6])
-					self.total_flows += 1
+						self.entropy(ent_data)
+						self.total_pkts += int(row2[6])
+						self.total_flows += 1
                 		count += 1
 		#print "done"
 		self.dump(0)
