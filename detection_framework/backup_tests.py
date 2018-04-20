@@ -99,66 +99,19 @@ class DetectionTester:
                         # Add only newly added nfcapd files
                         if current_time < os.path.getmtime(abs_fname):
 				# add the new nfcapd file to the queue
-				#name = abs_fname.replace(os.path.abspath(dirname),'')
-				file_queue.append(abs_fname) 
-                                current_time = os.path.getmtime(abs_fname)
-    	file_queue.append(current_time)
-    	return file_queue
-
-    # Update a queue of nfdump files to be read by the detector
-    def read_nfcapd(self, current_time):
-    	file_queue = deque()
-
-    	#print threading.currentThread().getName(), 'Read nfcapd()'
-    
-
-    	lock = threading.Lock()
-
-    	file_count = 0
-     
-    	# Read from the nfcapd files in the chosen directory
-    	sortedFiles = []
-    	fileTimes = []
-    	nfDumpFiles = []
-
-    	file_count = 0
-    	# For each new nfcapd file, get nfdump, then read nfdump and run the test
-    	cmd = ['../nfdump/bin/nfdump', '-o', 'csv', '-r', 0]
-
-    	#nf_directory = "."
-    	for dirname, subdirList, fileList in os.walk(self.nf_directory): #, topdown=False):
-                fileList = [k for k in fileList if 'nfcapd' in k and not 'csv' in k]
-	
-		for i in range(len(fileList)):
-			fileList[i] = os.path.abspath(os.path.join(dirname, fileList[i]))
-		fileList = sorted(fileList, cmp=self.compare_times)
-
-                for fname in fileList:
-                        abs_fname = os.path.abspath(os.path.join(dirname, fname))
-                        cmd[4] = abs_fname
-
-			#print "test"
-                        # Test only newly added nfcapd files
-                        if current_time < os.path.getmtime(abs_fname):
-                                #file_count += 1
-                                # Create an nfdump file                       
-                                copy_dirname = 'nfdump'
-				#fname = str(file_count) + fname
-                                abs_csv_fname = os.path.abspath(os.path.join(copy_dirname, fname)) + '.csv'
-                                #print abs_csv_fname
-				# Use a lock to prevent two threads from writing
-				# the same nfdump file
-				
+				abs_fname = abs_fname.replace(os.path.abspath(dirname),'')
+				cmd[4] = abs_fname
+				copy_dirname = 'nfdump'
+				abs_csv_fname = os.path.abspath(os.path.join(copy_dirname, fname)) + '.csv'
 				if os.path.isfile(abs_csv_fname) == False:
 					self.file_lock.acquire()
 					try:
-                                		with open(abs_csv_fname, 'wb') as ff:  
+						with open(abs_csv_fname, 'wb') as ff:
 							call(cmd, stdout=ff)
 					finally:
 						self.file_lock.release()
-	
-				# add the new nfdump file to the queue
-				file_queue.append(abs_csv_fname)
+
+				file_queue.append(abs_csv_fname) 
                                 current_time = os.path.getmtime(abs_fname)
     	file_queue.append(current_time)
     	return file_queue
@@ -273,10 +226,10 @@ class DetectionTester:
 			print filename
 			if filename in self.completed_files:
 				if self.completed_files[filename] < self.test_count:
-             		  		entropy_tester.detect_entropy(filename)
+             		  		entropy_tester.detect_entropy_ts(filename)
 					self.nfdump_complete(filename, "ent")
 			else:
-				entropy_tester.detect_entropy(filename)
+				entropy_tester.detect_entropy_ts(filename)
 			#else: # tstat file
 				#entropy_tester.detect_entropy_ts(filename)
 
@@ -355,9 +308,9 @@ class DetectionTester:
     def run_threads(self):
 	self.test_count = 1
 	t1 = InterruptableThread(self.dns_ampl_test)
-    	#t2 = InterruptableThread(self.wavelet_test2)
+    	t2 = InterruptableThread(self.wavelet_test2)
     	t1.start()
-    	#t2.start()
+    	t2.start()
 	t1.join()
-    	#t2.join()
+    	t2.join()
 
