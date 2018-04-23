@@ -180,18 +180,20 @@ class Entropy:
     		# Read the nfdump file, flow-by-flow
     		with open(nfdump, 'rb') as csvfile:
         		nfreader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        		for row in nfreader:
+			for row in nfreader:
                 		if count >= 1 and len(row) > 11:
                         		#print ', '.join(row)
                         		ent_data = []
+					#print row
                         		ent_data.append(row[3]) # src ip
                         		ent_data.append(row[4]) # dst ip
                         		ent_data.append(row[5]) # src port
                         		ent_data.append(row[6]) # dst port
                         		ent_data.append(row[11]) # packet count
-                        		ent_data.append(int(row[11]) # count
-					ent_data.append(int(row[13]) # flows
+                        		ent_data.append(int(row[12])) # total size
+					ent_data.append(int(row[11])) # pkts
                         		#print(ent_data)
+					
                         		self.entropy(ent_data)
                 		count += 1
     		# Calculate entropy score and check for potential DDoS targets

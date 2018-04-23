@@ -123,7 +123,7 @@ class DetectionTester:
 
     	file_count = 0
     	# For each new nfcapd file, get nfdump, then read nfdump and run the test
-    	cmd = ['../nfdump/bin/nfdump', '-o', 'csv', '-r', 0]
+    	cmd = ['../../nfdump/bin/nfdump', '-o', 'csv', '-r', 0]
 
     	#nf_directory = "."
     	for dirname, subdirList, fileList in os.walk(self.nf_directory): #, topdown=False):
@@ -149,10 +149,11 @@ class DetectionTester:
 				# Use a lock to prevent two threads from writing
 				# the same nfdump file
 				
+				print abs_csv_fname
 				if os.path.isfile(abs_csv_fname) == False:
 					self.file_lock.acquire()
 					try:
-                                		with open(abs_csv_fname, 'wb') as ff:  
+                                		with open(abs_csv_fname, 'wb') as ff: 
 							call(cmd, stdout=ff)
 					finally:
 						self.file_lock.release()
@@ -180,7 +181,7 @@ class DetectionTester:
 
 
     # Update a queue of nfdump files to be read by the detector
-    def read_nfcapd(self, current_time):
+    def read_nfcapd_alt(self, current_time):
     	file_queue = deque()
 
     	#print threading.currentThread().getName(), 'Read nfcapd()'
@@ -307,7 +308,7 @@ class DetectionTester:
             		nfdump_file = file_queue.popleft()
 
 			if nfdump_file in self.completed_files:
-                                if self.completed_files[filename] < self.test_count:
+                                if self.completed_files[nfdump_file] < self.test_count:
             				# Insert dns response test code here
 					rsp_tester.detect_reflection(nfdump_file)
 	    				# remove the completed files 

@@ -61,11 +61,11 @@ def main(argv):
     #detection_tester.run_threads()
     detection_tester.test_count = 2 # number of nfdump-based tests, for removing the finished files
     t1 = InterruptableThread(detection_tester.dns_ampl_test)
-    #t2 = InterruptableThread(detection_tester.dns_rsp_test)
+    t2 = InterruptableThread(detection_tester.dns_rsp_test)
     t1.start()
-    #t2.start()
+    t2.start()
     t1.join()
-    #t2.join()
+    t2.join()
 
  
 if __name__ == "__main__":
