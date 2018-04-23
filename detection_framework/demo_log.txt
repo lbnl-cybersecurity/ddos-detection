@@ -88,3 +88,13 @@
 [INFO] (Thread-1  ) 204.38.0.0, 838071895, low entropy: 0.268482418636, potential DDoS attack
 [INFO] (Thread-1  ) 204.38.0.0, 838071895, low entropy: 0.268482418636, potential DDoS attack
 [INFO] (Thread-2  ) High DNS responses sent to 204.38.0.0, 16077186 response packets
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
+[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
