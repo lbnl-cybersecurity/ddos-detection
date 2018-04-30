@@ -1,0 +1,44 @@
+A modular detection tool for monitoring network logs.  Currently set for monitoring nfcapd files.  Given an nfcapd directory, this tool will continuously check for newly added log files and apply each analytics module in a separate thread.  For example, one thread can calculate the entropy scores for each observed flow, while another thread monitors the number of DNS responses. 
+
+Usage: detection_main.py -i <netflow directory> -o <log name>
+
+Main module: detection_main.py
+In detection_main.py, set the number of tests and start each thread.  
+
+detection_tests.py contains common functions and the thread functions.  Any detection test thread must have the following format:
+
+def test_thread(self, t):
+    	current_time = 0
+
+    	print threading.currentThread().getName(), 'Starting'
+    	while not t.is_stop_requested():
+    		file_queue = deque()
+    		time.sleep(1)
+
+    		file_queue = deepcopy(self.read_nfcapd(current_time))
+    		while len(file_queue) > 1:
+            		nfdump_file = file_queue.popleft()
+
+			if nfdump_file in self.completed_files:
+                                if self.completed_files[nfdump_file] < self.test_count:
+            				# insert test code here
+
+	    					# remove the completed files
+	    					self.nfdump_complete(nfdump_file, "thread name")
+			else:
+				# insert test code here
+
+				# remove the completed files
+				self.nfdump_complete(nfdump_file, "thread name")
+
+			logging.info("log file string")
+
+    		if len(file_queue) == 1:
+            		current_time = file_queue.popleft()
+
+After defining the thread this way, it can be called in detection_main.py as follows:
+
+thread_name = InterruptableThread(detection_tester.test_thread)
+thread_name.start()
+thread_name.join()
+
