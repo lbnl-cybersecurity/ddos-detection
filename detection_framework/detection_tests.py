@@ -1,4 +1,4 @@
-#  This file contains all the detection test code
+#  This file contains the code for handling new detection test threads
 
 import socket
 import struct
@@ -13,7 +13,7 @@ import thread
 import threading
 import signal
 import logging
-
+import importlib
 
 from interruptable_thread import InterruptableThread
 from subprocess import call
@@ -23,7 +23,7 @@ from Queue import Queue
 from collections import deque
 from entropy_test import *
 from wavelet_test import *
-from req_rsp import *
+from dns_test import *
 from netflow_classes import * 
 from copy import deepcopy
 
@@ -95,7 +95,6 @@ class DetectionTester:
                 for fname in fileList:
                         abs_fname = os.path.abspath(os.path.join(dirname, fname))
 
-			#print "test"
                         # Add only newly added nfcapd files
                         if current_time < os.path.getmtime(abs_fname):
 				# add the new nfcapd file to the queue
@@ -108,10 +107,6 @@ class DetectionTester:
     # Update a queue of nfdump files to be read by the detector
     def read_nfcapd(self, current_time):
     	file_queue = deque()
-
-    	#print threading.currentThread().getName(), 'Read nfcapd()'
-    
-
     	lock = threading.Lock()
 
     	file_count = 0
@@ -137,7 +132,6 @@ class DetectionTester:
                         abs_fname = os.path.abspath(os.path.join(dirname, fname))
                         cmd[4] = abs_fname
 
-			#print "test"
                         # Test only newly added nfcapd files
                         if current_time < os.path.getmtime(abs_fname):
                                 #file_count += 1
@@ -145,11 +139,11 @@ class DetectionTester:
                                 copy_dirname = 'nfdump'
 				#fname = str(file_count) + fname
                                 abs_csv_fname = os.path.abspath(os.path.join(copy_dirname, fname)) + '.csv'
-                                #print abs_csv_fname
+
 				# Use a lock to prevent two threads from writing
 				# the same nfdump file
 				
-				print abs_csv_fname
+				#print abs_csv_fname
 				if os.path.isfile(abs_csv_fname) == False:
 					self.file_lock.acquire()
 					try:
@@ -184,8 +178,6 @@ class DetectionTester:
     def read_nfcapd_alt(self, current_time):
     	file_queue = deque()
 
-    	#print threading.currentThread().getName(), 'Read nfcapd()'
-    
 
     	lock = threading.Lock()
 
@@ -236,13 +228,13 @@ class DetectionTester:
     	self.completed_files_lock.acquire()
     	try:
 			self.completed_files[nfdump_file] = self.completed_files.get(nfdump_file, 0) + 1
-			print self.completed_files[nfdump_file]
-			print "by %s %d" % (name, self.completed_files[nfdump_file])
+			#print self.completed_files[nfdump_file]
+			#print "by %s %d" % (name, self.completed_files[nfdump_file])
 			# if the count is equal to the number of detection threads, file is no longer needed
 			if self.completed_files[nfdump_file] == self.test_count and os.path.isfile(nfdump_file) == True:
 				os.remove(nfdump_file)
 				self.files_tested += 1
-				print "file %d: %s tested, executed by %s" % (self.files_tested, nfdump_file, name)
+				#print "file %d: %s tested, executed by %s" % (self.files_tested, nfdump_file, name)
     	finally:
 			self.completed_files_lock.release()
 
@@ -250,13 +242,21 @@ class DetectionTester:
     # Detection Threads
     # One thread for each type of detection test
     # Later add option to enable/disable certain tests
-    def dns_ampl_test(self, t):
+	
+	# Generic function for starting a new test thread.  Calls the run_test method for a given module.
+    def start_test(self, t, test_name):
         current_time = 0
 
-    	print threading.currentThread().getName(), 'Starting'
+  	#print test_name
+    	print"Starting", test_name
+
+	function_string = test_name
+	mod_name, func_name = function_string.rsplit('.',1)
+	mod = importlib.import_module(mod_name)
+	func = getattr(mod, func_name)
+	tester = func()
+
     	while not t.is_stop_requested():
-    		entropy_tester = Entropy()
-    	
     		time.sleep(2)
     		file_queue = deque()
     		time.sleep(2)
@@ -265,100 +265,24 @@ class DetectionTester:
              		#print("dns", nfdump_file)
 
              		# Run the test here on each file in the queue
-			entropy_tester.feature = "da"
-			entropy_tester.data_type = "netflow"
-			entropy_tester.ent_type = "avg_size"
 
 			filename = file_queue.popleft()
 
-			print filename
+			#print filename
 			if filename in self.completed_files:
 				if self.completed_files[filename] < self.test_count:
-             		  		entropy_tester.detect_entropy(filename)
-					self.nfdump_complete(filename, "ent")
+					tester = func()
+					tester.run_test(filename)
+					self.nfdump_complete(filename, test_name)
 			else:
-				entropy_tester.detect_entropy(filename)
-			#else: # tstat file
-				#entropy_tester.detect_entropy_ts(filename)
+				tester = func()
+				tester.run_test(filename)
+			# update the completed_files dict to indicate the thread has completed processing this file
+	     			self.nfdump_complete(filename, test_name)
 
-	     		# update the completed_files dict to indicate the thread has completed processing this file
-	     			self.nfdump_complete(filename, "ent")
-
-			if entropy_tester.log_entry != "":
-				logging.info(entropy_tester.log_entry)
-	     
-
+			if tester.log_entry != "":
+				logging.info(tester.log_entry)
+				#print tester.log_entry
     		if len(file_queue) == 1:
              		current_time = file_queue.popleft()
-    	#logging.info('finished entropy')
-
-    def dns_rsp_test(self, t):
-    	current_time = 0
-
-    	print threading.currentThread().getName(), 'Starting'
-    	while not t.is_stop_requested():
-    		rsp_tester = RequestResponse()
-
-    	
-    		time.sleep(3)
-    		file_queue = deque()
-    		time.sleep(2)
-    		file_queue = deepcopy(self.read_nfcapd(current_time))
-    		while len(file_queue) > 1:
-            		nfdump_file = file_queue.popleft()
-
-			if nfdump_file in self.completed_files:
-                                if self.completed_files[nfdump_file] < self.test_count:
-            				# Insert dns response test code here
-					rsp_tester.detect_reflection(nfdump_file)
-	    				# remove the completed files 
-	    				self.nfdump_complete(nfdump_file, "Rsp")
-			else:
-				rsp_tester.detect_reflection(nfdump_file)
-				self.nfdump_complete(nfdump_file, "Rsp")
-
-			if rsp_tester.log_entry != "":
-                                logging.info(rsp_tester.log_entry)
-
-    		if len(file_queue) == 1:
-            		current_time = file_queue.popleft()
-		#logging.info('wavelet')
-    	#logging.info('done wavelet')
-
-    def wavelet_test2(self, t):
-    	current_time = 0
-    
-    	print threading.currentThread().getName(), 'Starting'
-    	while not t.is_stop_requested():
-    		wavelet_tester = Wavelet()
-		time.sleep(1)
-    		file_queue = deque()
-    		file_queue = deepcopy(self.get_nfcapd(current_time))
-    		while len(file_queue) > 1:
-            		nfcapd_file = file_queue.popleft()
-
-            		# Insert wavelet test code here
-            		wavelet_tester.list_of_files.append(nfcapd_file)
-			wavelet_tester.run_wavelet()
-			if wavelet_tester.log_entry != "":
-				logging.info(wavelet_tester.log_entry)
-
-    		if len(file_queue) == 1:
-            		current_time = file_queue.popleft()
-		#logging.info('wavelet')
-    	#logging.info('done wavelet')
-
-    def tcp_syn_test(self, t):
-    	print threading.currentThread().getName(), 'Starting'
-    	time.sleep(4)
-    	print threading.currentThread().getName(), 'Exiting'	
-
-    def run_threads(self):
-	self.test_count = 1
-	t1 = InterruptableThread(self.dns_ampl_test)
-    	#t2 = InterruptableThread(self.wavelet_test2)
-    	t1.start()
-    	#t2.start()
-	t1.join()
-    	#t2.join()
 

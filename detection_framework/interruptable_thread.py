@@ -39,9 +39,10 @@ class GlobalInterruptableThreadHandler:
         GlobalInterruptableThreadHandler.threads = []    
 
 class InterruptableThread:
-    def __init__(self, target=None):
+    def __init__(self, function_name, target=None):
         self.stop_requested = threading.Event()
-        self.t = threading.Thread(target=target, args=[self]) if target else threading.Thread(target=self.run)
+        self.t = threading.Thread(target=target, args=[self, function_name]) if target else threading.Thread(target=self.run)
+	
 
     def run(self):
         pass
