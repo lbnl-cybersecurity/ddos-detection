@@ -119,9 +119,9 @@ class Entropy:
                         	if field in self.feature:
 					if hx_norm <= 0.3:#self.threshold:
 						self.log_entry = "%s, %s, low entropy: %s, potential DDoS attack" % (topIP, topDest, hx_norm)
-                                		print self.log_entry
-					else:
-						print "normal entropy %s" % (hx_norm)	
+                                		#print self.log_entry
+					#else:
+						#print "normal entropy %s" % (hx_norm)	
 	def dump2(self, count):
     		row = [count]
     		print("Recording blank file", count)
@@ -298,3 +298,7 @@ class Entropy:
                 #print "done dtn"
 		self.dump(0)
                 self.curr_s_dict = {}
+	
+	# Run the entropy test
+	def run_test(self, nfdump):
+		self.detect_entropy(nfdump)
