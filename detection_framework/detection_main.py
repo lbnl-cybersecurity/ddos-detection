@@ -19,6 +19,7 @@ import logging
 
 
 from interruptable_thread import InterruptableThread
+from configobj import ConfigObj
 from subprocess import call
 from math import log
 from socket import inet_ntoa
@@ -29,6 +30,7 @@ from wavelet_test import *
 from detection_tests import *
 from netflow_classes import * 
 from copy import deepcopy
+
 
 def main(argv):
     # use /project/projectdirs/hpcsecure/ddos/lbl-mr2-anon/2016/01/31/ for testing
@@ -55,17 +57,27 @@ def main(argv):
     print 'logfile name is ', detection_tester.log_file
 
 
-    print ("starting threads")
+    print ("Starting tests")
     # start the detection threads
     detection_tester.configure_log()
-    #detection_tester.run_threads()
     detection_tester.test_count = 2 # number of nfdump-based tests, for removing the finished files
-    t1 = InterruptableThread(detection_tester.dns_ampl_test)
-    t2 = InterruptableThread(detection_tester.dns_rsp_test)
-    t1.start()
-    t2.start()
-    t1.join()
-    t2.join()
+
+    config = ConfigObj("config.ini")
+
+    tests = []
+    for test in config["tests"].values():
+	tests.append(test)
+
+    detection_tester.test_count = len(tests)
+
+    threads = []
+    for test in tests:
+        t = InterruptableThread(test, detection_tester.start_test)
+	threads.append(t)
+    for t in threads:
+	t.start()
+    for t in threads:
+	t.join()
 
  
 if __name__ == "__main__":
