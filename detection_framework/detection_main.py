@@ -16,7 +16,7 @@ import thread
 import threading
 import signal
 import logging
-
+import globals
 
 from interruptable_thread import InterruptableThread
 from configobj import ConfigObj
@@ -60,10 +60,22 @@ def main(argv):
     print ("Starting tests")
     # start the detection threads
     detection_tester.configure_log()
-    detection_tester.test_count = 2 # number of nfdump-based tests, for removing the finished files
 
     config = ConfigObj("config.ini")
 
+    #  Store variables defined in config file in global dictionary
+    #  Test threads setting can be modified this way
+    for key in config.keys():
+	if key != "tests":
+	  #print key
+	  #print config[key]
+	  globals.test_vars[key] = config[key]
+	  
+    for key in globals.test_vars.keys():
+	print key
+	print globals.test_vars[key] 
+
+    # Load the tests from config file 
     tests = []
     for test in config["tests"].values():
 	tests.append(test)
