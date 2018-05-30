@@ -409,9 +409,7 @@ class Wavelet():
 					topN = {"188.240.101.40":1}
 						
 					for key in topN: 
-							
-						#ip_address = input("input ip_address")
-						#date = input("Input date")
+
 				
 						self.single_host_analysis(key, trace_string, file_range, dir)
 					self.list_of_files.pop(0)
