@@ -3,10 +3,8 @@ A modular detection tool for monitoring network logs.  Currently set for monitor
 Usage: detection_main.py -i <netflow directory> -o <log name>
 
 Main module: detection_main.py
-In detection_main.py, set the number of tests and start each thread.  
 
-detection_tests.py contains common functions and the thread functions.  Any detection test thread must have the following format:
-
+The individual detection tests are defined as classes within python modules.  The config.ini file determines which tests will be loaded. 
 To add a new test, do the following:
 1.  Define the detection test as a class.
 2.  In the class, create a function called run_test which takes an nfdump file as input.  The start_test() function in detection_tests.py calls this.
