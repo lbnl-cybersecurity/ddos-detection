@@ -12,6 +12,7 @@ import getopt
 import collections
 import shutil
 import logging
+import globals
 from subprocess import call
 from math import log
 
@@ -117,7 +118,7 @@ class Entropy:
 						#print self.curr_s_dict['da']
 				#print hx_norm
                         	if field in self.feature:
-					if hx_norm <= 0.3:#self.threshold:
+					if hx_norm <= self.threshold:
 						self.log_entry = "%s, %s, low entropy: %s, potential DDoS attack" % (topIP, topDest, hx_norm)
                                 		#print self.log_entry
 					#else:
@@ -301,4 +302,8 @@ class Entropy:
 	
 	# Run the entropy test
 	def run_test(self, nfdump):
+		if "Entropy_thresh" in globals.test_vars:
+			self.threshold = float(globals.test_vars["Entropy_thresh"])
+		#print self.threshold
+		#if globals.test_vars["ent_repeat"] != None:
 		self.detect_entropy(nfdump)
