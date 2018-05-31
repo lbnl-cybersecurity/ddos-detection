@@ -1,6 +1,12 @@
 # Request-based DDoS detection methods
 # Use these methods on nfdump data
 # Test for unusually large requests from a given port number
+# Default port is 53 (DNS)
+
+# variables
+# request_thresh: threshold for triggering an alert
+# request_repeat: 1 for repeating alerts, 0 for non-repeating alerts
+# request_port: port to check
 
 import socket
 import struct
