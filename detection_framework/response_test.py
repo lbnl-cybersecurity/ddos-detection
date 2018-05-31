@@ -42,15 +42,6 @@ class RequestResponse:
 		self.flow_count = 0
 		self.no_dump = False
 		self.log_entry = ""
-		self.results1 = []
-		self.results2 = []
-		self.results3 = []
-		self.results4 = []
-		self.results5 = []
-		self.results6 = []
-		self.results7 = []
-		self.results8 = []
-		self.results9 = []
 		self.max_pkts = 0 # highest packet count per 5 minutes
 		self.max_flow = "" # flow with highest pkts
 		self.max_pkts_req = 0
