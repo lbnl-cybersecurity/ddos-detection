@@ -11,3 +11,5 @@ To add a new test, do the following:
 3.  Then you can add it to the config.ini file by adding "test_name = module_name.class_name"
 4.  The tester class also needs a variable called "log_entry".  When tester.log_entry is not empty, the entry is recorded to the log by the function feeding nfdump files to the tester. 
 5.  Variables such as test thresholds can be modified using config.ini
+
+config.ini contains variables for setting test parameters and which tests to run.  The variables are loaded into the global dictionary test_vars.
