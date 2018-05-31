@@ -1,6 +1,5 @@
-# Entropy and volume based DDoS detection methods
-# Use these methods on flow data in detection_framework.py
-# Performs the test and creates the log file
+# A simple Entropy-based DDoS detection test
+# Calculates the Shannon Entropy for each nfcapd file and compares to a threshold value
 
 import socket
 import struct
