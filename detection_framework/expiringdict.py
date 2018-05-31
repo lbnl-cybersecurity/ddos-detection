@@ -1,4 +1,6 @@
 # github.com/mailgun/expiringdict
+# Used for optionally eliminating repeat alerts.
+
 '''
 Dictionary with auto-expiring values for caching purposes.
 
