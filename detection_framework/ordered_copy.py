@@ -1,3 +1,4 @@
+# Testing script.
 # This script copies nfcapd files from a given directory
 # every X minutes into another directory.
 # The files are copied in order based on modification date to simulate incoming traffic.
