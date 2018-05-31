@@ -1,5 +1,0 @@
-[INFO] (Thread-1  ) 118.178.240.0, 542681611, low entropy: 0.251354194157, potential DDoS attack
-[INFO] (Thread-1  ) 118.178.240.0, 542681611, low entropy: 0.251354194157, potential DDoS attack
-[INFO] (Thread-1  ) 118.178.240.0, 263993600, low entropy: 0.303812286884, potential DDoS attack
-[INFO] (Thread-1  ) 101.200.120.0, 26157298, low entropy: 0.688603749823, potential DDoS attack
-[INFO] (Thread-1  ) 219.128.72.0, 196672997, low entropy: 0.401435231716, potential DDoS attack
