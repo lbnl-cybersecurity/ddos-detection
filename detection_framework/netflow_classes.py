@@ -1,6 +1,6 @@
 
 
-# This module contains classes for handling Netflow v9 data
+# This module contains classes for handling Netflow v9 data.
 
 #!/usr/bin/env python3
 
