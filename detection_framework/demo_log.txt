@@ -1,7 +1,0 @@
-[INFO] (Thread-1  ) 188.241.77.25, 5781433, low entropy: 0.202014996546, potential DDoS attack
-[INFO] (Thread-2  ) High responses sent to 168.244.181.197, 2000 response packets with port 53
-[INFO] (Thread-3  ) High requests sent to 212.83.84.109, 1000 response packets with port 53
-[INFO] (Thread-3  ) High requests sent to 218.225.176.112, 1000 response packets with port 53
-[INFO] (Thread-2  ) High responses sent to 188.241.243.194, 1000 response packets with port 53
-[INFO] (Thread-3  ) High requests sent to 211.61.227.240, 1000 response packets with port 53
-[INFO] (Thread-3  ) High requests sent to 175.10.158.76, 1000 response packets with port 53
