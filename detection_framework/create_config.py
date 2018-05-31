@@ -1,4 +1,5 @@
-# Create a new config file using configobj
+# Creates a new formatted config file using configobj
+# Can create the config file using this method, or just writing to it directly
 
 from configobj import ConfigObj
 config = ConfigObj()
