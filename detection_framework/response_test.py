@@ -14,9 +14,10 @@ import shutil
 import math
 import logging
 import globals
+
 from subprocess import call
 from math import log
-
+from expiringdict import *
 from socket import inet_ntoa
 
 # Test for DDoS attacks by looking at  
@@ -48,6 +49,12 @@ class RequestResponse:
 		self.max_flow = "" # flow with highest pkts
 		self.max_pkts_req = 0
 		self.max_flow_req = ""
+		if "response_cache_time" in globals.test_vars:
+			seconds = globals.test_vars["response_cache_time"]
+		else:
+			seconds = 86400
+		self.cache = ExpiringDict(max_len=10000000, max_age_seconds=seconds)
+		self.repeating = 1
 
 		# Settings
 		self.protocol_port = 53
@@ -86,29 +93,14 @@ class RequestResponse:
                                         ent_data.append(row[7]) # protocol - 17 is UDP
 
 
-					if row[6] == self.protocol_port:# and row2[2] == "17":									
+					if row[6] == self.protocol_port:							
 						aggregate_reqs.setdefault(row[3], []).append(ent_data)
-					if row[5] == self.protocol_port:# and row2[2] == "17":
+					if row[5] == self.protocol_port:
 						aggregate_rsps.setdefault(row[4],[]).append(ent_data)	
 						
                         	count += 1
 
-			#  Check request total
-			#for key in aggregate_reqs:
-				#agg_pkts = 0
-				#agg_size = 0
-				#for flow_list in aggregate_reqs[key]:
-					#if flow_list[5].isdigit() and flow_list[4].isdigit():
-						#agg_pkts += int(flow_list[5])
-						#agg_size += int(flow_list[4])
-				#if self.max_pkts_req < agg_pkts:
-                                 #       self.max_pkts_req = agg_pkts
-                                  #      self.max_flow_req = key
-	
-				#if agg_pkts > self.pkt_thresh:
-					# check the record more closely
-					# calculate standard deviation of request size
-					
+
 		# Part 2 of detection test - Check responses
 		for key in aggregate_rsps:
 				agg_pkts = 0
@@ -122,10 +114,15 @@ class RequestResponse:
 					self.max_pkts = agg_pkts 
 					self.max_flow = key
 
-				#print "working DNS"
-                                if agg_pkts > self.pkt_thresh:
-                                        # possible attack,raise alert
-					self.log_entry = "High responses sent to %s, %d response packets with port %s" % (key, agg_pkts,self.protocol_port)
+				self.log_entry = ""
+                 		if agg_pkts > self.pkt_thresh:
+
+		 			if key not in self.cache:
+                        		# possible attack,raise alert
+						self.log_entry = "High responses sent to %s, %d response packets with port %s" % (key, agg_pkts,self.protocol_port)
+						if self.repeating == 0:
+							self.cache[key] = 1
+						
 				
 	# Run the dns request test
 	def run_test(self, nfdump):
@@ -133,4 +130,6 @@ class RequestResponse:
 			self.pkt_thresh = int(globals.test_vars["response_thresh"])
 		if "response_port" in globals.test_vars:
 			self.protocol_port = globals.test_vars["response_port"]
+		if "response_repeat" in globals.test_vars:
+			self.repeating = int(globals.test_vars["response_repeat"])
 		self.detect_reflection(nfdump)				
