@@ -1,3 +1,4 @@
+# Testing script.
 # This script copies a random file from this directory
 # every X minutes into another directory.
 # Use this script for testing the detection tool
