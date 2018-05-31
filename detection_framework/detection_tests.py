@@ -14,7 +14,9 @@ import threading
 import signal
 import logging
 import importlib
+import globals
 
+from expiringdict import *
 from interruptable_thread import InterruptableThread
 from subprocess import call
 from math import log
@@ -40,6 +42,7 @@ class DetectionTester:
 	self.completed_files = dict()
 	self.test_count = 0
 	self.file_type = "nfdump"
+	self.cache = ExpiringDict(max_len=100000, max_age_seconds=86400)
 
     def configure_log(self):
 	# configure the log
@@ -118,8 +121,10 @@ class DetectionTester:
 
     	file_count = 0
     	# For each new nfcapd file, get nfdump, then read nfdump and run the test
-    	cmd = ['../../nfdump/bin/nfdump', '-o', 'csv', '-r', 0]
-
+	if "nfdump_path" in globals.test_vars:
+    		cmd = [globals.test_vars["nfdump_path"], '-o', 'csv', '-r', 0]
+	else:
+		cmd = ['nfdump', '-o', 'csv', '-r', 0]
     	#nf_directory = "."
     	for dirname, subdirList, fileList in os.walk(self.nf_directory): #, topdown=False):
                 fileList = [k for k in fileList if 'nfcapd' in k and not 'csv' in k]
@@ -271,11 +276,11 @@ class DetectionTester:
 			#print filename
 			if filename in self.completed_files:
 				if self.completed_files[filename] < self.test_count:
-					tester = func()
-					tester.run_test(filename)
+					#tester = func() #reset tester
+ 					tester.run_test(filename)
 					self.nfdump_complete(filename, test_name)
 			else:
-				tester = func()
+				#tester = func()
 				tester.run_test(filename)
 			# update the completed_files dict to indicate the thread has completed processing this file
 	     			self.nfdump_complete(filename, test_name)
