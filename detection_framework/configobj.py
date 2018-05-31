@@ -1,3 +1,4 @@
+# For reading and writing the configuration files
 # configobj.py
 # A config file reader/writer that supports nested sections in config files.
 # Copyright (C) 2005-2010 Michael Foord, Nicola Larosa
