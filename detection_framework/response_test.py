@@ -1,6 +1,12 @@
-# Entropy and volume based DDoS detection methods
-# Use these methods on flow data in detection_framework.py
-# Performs the test and creates the log file
+# Response-based DDoS detection methods
+# Use these methods on nfdump data
+# Test for unusually large number of responses with a given port number
+# Default port is 53 (DNS)
+
+# variables
+# response_thresh: packet threshold for triggering an alert
+# response_repeat: 1 for repeating alerts, 0 for non-repeating alerts
+# response_port: port to check
 
 import socket
 import struct
