@@ -1,4 +1,5 @@
-#  This file contains the code for handling new detection test threads
+#  This file contains general functions for handling new detection test threads
+#  Includes functions for reading new logs and running the tests
 
 import socket
 import struct
