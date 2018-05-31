@@ -1,4 +1,4 @@
-
+# Interruptible thread class
 
 import threading
 import signal
