@@ -15,7 +15,7 @@ import logging
 import globals
 from subprocess import call
 from math import log
-
+from expiringdict import *
 from socket import inet_ntoa
 
 # Test for DDoS attacks by looking at the 
@@ -36,8 +36,14 @@ class Entropy:
 		self.log_entry = ""
 		self.total_pkts = 0
 		self.total_flows = 0
-		
+		if "entropy_cache_time" in globals.test_vars:
+			seconds = globals.test_vars["entropy_cache_time"]
+		else:
+			seconds = 86400
+		self.cache = ExpiringDict(max_len=100, max_age_seconds=seconds)		
+
 		# Settings
+		self.repeating = 1
 		self.feature = "da"
 		self.data_type = "netflow"
 		self.ent_type = "avg_size"
@@ -119,8 +125,11 @@ class Entropy:
 				#print hx_norm
                         	if field in self.feature:
 					if hx_norm <= self.threshold:
-						self.log_entry = "%s, %s, low entropy: %s, potential DDoS attack" % (topIP, topDest, hx_norm)
+						if topIP not in self.cache:
+							self.log_entry = "%s, %s, low entropy: %s, potential DDoS attack" % (topIP, topDest, hx_norm)
                                 		#print self.log_entry
+							if self.repeating == 0:
+								self.cache[topIP] = 1				
 					#else:
 						#print "normal entropy %s" % (hx_norm)	
 	def dump2(self, count):
@@ -304,6 +313,9 @@ class Entropy:
 	def run_test(self, nfdump):
 		if "Entropy_thresh" in globals.test_vars:
 			self.threshold = float(globals.test_vars["Entropy_thresh"])
-		#print self.threshold
+		# Reset entropy dictionary for next file
+		self.curr_s_dict = {}
+		if "entropy_repeat" in globals.test_vars:
+			self.repeating = int(globals.test_vars["entropy_repeat"])
 		#if globals.test_vars["ent_repeat"] != None:
 		self.detect_entropy(nfdump)

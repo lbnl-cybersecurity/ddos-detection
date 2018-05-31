@@ -14,9 +14,10 @@ import shutil
 import math
 import logging
 import globals
+
 from subprocess import call
 from math import log
-
+from expiringdict import *
 from socket import inet_ntoa
 
 # Test for DDoS attacks by looking at  
@@ -48,6 +49,12 @@ class RequestResponse:
 		self.max_flow = "" # flow with highest pkts
 		self.max_pkts_req = 0
 		self.max_flow_req = ""
+		if "request_cache_time" in globals.test_vars:
+			seconds = globals.test_vars["request_cache_time"]
+		else:
+			seconds = 86400
+		self.cache = ExpiringDict(max_len=10000000, max_age_seconds=seconds)
+		self.repeating = 1	
 
 		# Settings
 		self.protocol_port = 53
@@ -102,10 +109,14 @@ class RequestResponse:
                                         self.max_pkts_req = agg_pkts
                                         self.max_flow_req = key
 	
+				self.log_entry = ""
 				if agg_pkts > self.pkt_thresh:
-					self.log_entry = "High requests sent to %s, %d packets with port %s" % (key, agg_pkts, self.protocol_port)
-					# check the record more closely
-					# calculate standard deviation of request size
+
+					if key not in self.cache:
+                        		# possible attack,raise alert
+						self.log_entry = "High requests sent to %s, %d response packets with port %s" % (key, agg_pkts,self.protocol_port)
+						if self.repeating == 0:
+							self.cache[key] = 1
 					
 
 	# Run the dns request test
@@ -114,4 +125,6 @@ class RequestResponse:
 			self.pkt_thresh = int(globals.test_vars["request_thresh"])
 		if "request_port" in globals.test_vars:
 			self.protocol_port = globals.test_vars["request_port"]
+		if "request_repeat" in globals.test_vars:
+			self.repeating = int(globals.test_vars["request_repeat"])
 		self.detect_reflection(nfdump)				
