@@ -1,18 +1,16 @@
-# ddos-detection
+## DDoS Detection Tool
+A modular detection tool for monitoring network logs.  Currently monitors nfcapd files.  Given an nfcapd directory, this tool will continuously check for newly added log files and apply each analytics module in a separate thread.  For example, one thread can calculate the entropy scores for each observed flow, while another thread monitors the number of DNS responses.  
 
-## Dataset analysis
-[Part1](./readme_part1.md): Preliminary data analysis.
+Usage: detection_main.py -i <netflow directory> -o <log name>
 
-## Automated DDoS Detection System
-Because the netflow records are sampled, it is not guarantteed that packets belong to both direction of a flow are captured. But again we would like to have a roughly estimate. We collect all the unique "source address" and "destination address" appearing within a unit time interval, and calculate the overlapping percentage. The result (from the first 5min monitoring interval of lbl_mr2 dataset) is shown below:
-```
-overlap: 452, total_sa: 1839, total_da: 1845.
-```
-The overlapping percentage is about 24.6%.
+Main module: detection_main.py
 
-### Simple Volume-based Anomaly Detector
-It is not scalable to track the aggregated traffic volume per destination for each destination appearing in a unit time interval. We are more interested in defending us from being DDoSed, than us generating DDoS traffic (under the assumption that our computers are managed by professional people). We are more interested in the IPs which we care for (i.e. from ESnets or Sites). 
+The individual detection tests are defined as classes within python modules.  The config.ini file determines which tests will be loaded. 
+To add a new test, do the following:
+1.  Define the detection test as a class.
+2.  In the class, create a function called run_test which takes an nfdump file as input.  The start_test() function in detection_tests.py calls this.
+3.  Then you can add it to the config.ini file by adding "test_name = module_name.class_name"
+4.  The tester class also needs a variable called "log_entry".  When tester.log_entry is not empty, the entry is recorded to the log by the function feeding nfdump files to the tester. 
+5.  Variables such as test thresholds can be modified using config.ini
 
---- Make my code more readable: follow the annotation style.---
-
-We find  
+config.ini contains variables for setting test parameters and which tests to run.  The variables are loaded into the global dictionary test_vars. 
