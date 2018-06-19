@@ -1,7 +1,7 @@
 ## DDoS Detection Tool
 A modular detection tool for monitoring network logs.  Currently monitors nfcapd files.  Given an nfcapd directory, this tool will continuously check for newly added log files and apply each analytics module in a separate thread.  For example, one thread can calculate the entropy scores for each observed flow, while another thread monitors the number of DNS responses.  
 
-Usage: detection_main.py -i <netflow directory> -o <log name>
+Usage: detection_main.py -i netflow_directory -o log_name
 
 Main module: detection_main.py
 
