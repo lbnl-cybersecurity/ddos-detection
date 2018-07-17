@@ -1,5 +1,7 @@
-## DDoS Detection Tool
-A modular detection tool for monitoring network logs.  Currently monitors nfcapd files.  Given an nfcapd directory, this tool will continuously check for newly added log files and apply each analytics module in a separate thread.  For example, one thread can calculate the entropy scores for each observed flow, while another thread monitors the number of DNS responses.  
+## LBNL DDoS Detection on Science Networks
+This software is a modular detection tool indended to support for monitoring network logs in order to detect denial of service attacks on "research and education" networks that disambiguates such attacks from sustained, high-volume network flows characteristic of large science projects, and referred to as "elephant flows."
+
+This tool currently monitors a directory for nfcapd files.  Given an nfcapd directory, this tool will continuously check for newly added log files and apply each analytics module in a separate thread.  For example, one thread can calculate the entropy scores for each observed flow, while another thread monitors the number of DNS responses.  
 
 Usage: detection_main.py -i netflow_directory -o log_name
 
@@ -14,3 +16,5 @@ To add a new test, do the following:
 5.  Variables such as test thresholds can be modified using config.ini
 
 config.ini contains variables for setting test parameters and which tests to run.  The variables are loaded into the global dictionary test_vars. 
+
+For questions, please contact Sean Peisert <sppeisert@lbl.gov>
